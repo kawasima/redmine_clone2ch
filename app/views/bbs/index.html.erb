@@ -1,0 +1,55 @@
+<style>
+ul.reaction {
+	list-style: none;
+	display: inline;
+}
+ul.reaction li {
+	display: inline;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border: 1px #009900 solid;
+	background-color: #33cc33;
+}
+</style>
+<script src="http://localhost:2525/socket.io/socket.io.js"></script>
+<script src="/plugin_assets/redmine_clone2ch/javascripts/handlebars-1.0.0.beta.6.js"></script>
+<script src="/plugin_assets/redmine_clone2ch/javascripts/jquery-1.7.1.min.js"></script>
+<script id="post-template" type="text/x-handlebars-template">
+{{#each posts}}
+<dt id="post-{{seq}}">{{seq}}: {{username}} : {{postedAt}}
+  <ul class="reaction">
+    <li data-reaction="roger"><a title="ラジャー">R</a></li>
+    <li data-reaction="thx"><a title="ありがとう">T</a></li>
+    <li data-reaction="www"><a title="ワラ">W</a></li>
+  </ul>
+</dt>
+<dd><pre>{{renderMessage message}}</pre></dd>
+{{/each}}
+</script>
+<script src="/javascripts/bbs.js"></script>
+<ul id="tlist">
+</ul>
+
+<form id="thread-form" method="POST">
+スレッド名: <input name="name" size="50"/><br/>
+<input type="submit" value="書き込む" name="submit">
+ 名前： <input name="username" size="19">
+ E-mail<font size="1"> (省略可) </font>: <input name="mail" size="19"><br>
+<textarea rows="5" cols="70" wrap="off" name="message"></textarea>
+<input type="hidden" name="threadId" value="1">
+</form>
+
+<hr/>
+<div id="thread-view">
+<h3 id="thread-name"></h3>
+<dl id="plist">
+</dl>
+<form id="post-form" method="POST">
+<input type="submit" value="書き込む" name="submit">
+ 名前： <input name="username" size="19">
+ E-mail<font size="1"> (省略可) </font>: <input name="mail" size="19"><br>
+<textarea rows="5" cols="70" wrap="off" name="message"></textarea>
+<input type="hidden" name="threadId" value="1">
+</form>
+</div>

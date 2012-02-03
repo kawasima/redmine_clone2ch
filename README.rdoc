@@ -1,0 +1,3 @@
+= clone2ch
+
+This is a Redmine plugin for 2ch clone bbs. Unlike 2ch, this plugin enables you to communicate and collaborate in real-time.
