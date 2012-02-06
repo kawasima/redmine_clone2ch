@@ -36,23 +36,21 @@ var Thread = mongoose.model('Thread', ThreadsSchema);
 
 mongoose.connect('mongodb://localhost/clone2ch');
 
-var users = { };
-
 var observe = io.of('/observe').on('connection', function (socket) {
-    var userId = users[socket.handshake.query["userId"]];
-    var user = redmine.getUser(userId);
-    users[userId] = user;
-    
-    for (var i=0; i < user.projects.length; i++) {
-	socket.join(user.projects[i]);
-    }
-    socket.on('disconnect', function() {
-	for (var i=0; i<user.projects; i++) {
-	    socket.leave(user.projects[i]);
+    var userId = socket.handshake.query["userId"];
+    redmine.getUser(userId, function(u) {
+	for (var i=0; i < user.projects.length; i++) {
+	    socket.join(user.projects[i]);
 	}
+	socket.on('disconnect', function() {
+	    for (var i=0; i<user.projects; i++) {
+		socket.leave(user.projects[i]);
+	    }
+	});
     });
 });
 
+var users = {};
 var bbs = io.of('/bbs').on('connection', function (socket) {
     var userId = socket.handshake.query["userId"];
     var projectId = socket.handshake.query["projectId"];
@@ -60,12 +58,22 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
     var user = null;
     redmine.getUser(userId, function(u) {
 	user = u;
-	users[user.id] = user;
 	socket.join(projectId);
+	if (!users[projectId]) {
+	    users[projectId] = []
+	}
+/*
+	for (var i=0; i<users[projectId].length; i++) {
+	    if (users[projectId][i].id  == user.id) 
+	    users[projectId].push(u);
+	}
+*/
+	socket.broadcast.to(projectId).emit('join', user);
+	socket.to(projectId).emit('list users', users[projectId]);
     });
 
     socket.on('threadlist', function (data) {
-	Thread.find({projectId: projectId}, function (err,threads) {
+	Thread.find({projectId: projectId}, [], { sort: { lastmodified: -1 }}, function (err,threads) {
 	    socket.emit('threadlist', threads);
 	});
     });
@@ -79,10 +87,6 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 	    var post = new Post(msg);
 	    post.save();
 
-	    var postedUser = users[msg.userId];
-	    msg.username = postedUser.login;
-	    msg.mail = postedUser.mail;
-		
 	    socket.broadcast.to(projectId).emit('update post', msg);
 	    // TODO inefficient
 	    socket.to(projectId).emit('update post', msg);
@@ -130,23 +134,8 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 
     socket.on('postlist', function (data) {
 	Thread.findById(data.threadId, function (err, th) {
-	    Post.find({threadId: th._id}, function (err, posts) {
-		var msgs = [ ];
-		for (var i=0; i<posts.length; i++) {
-		    var msg = posts[i].toObject();
-
-		    var postedUser = users[msg.userId];
-		    msgs.push(msg);
-		    if (postedUser) {
-			msg["username"] = postedUser.login;
-			msg["mail"] = postedUser.mail;
-		    } else {
-			redmine.getUser(msg.userId, function (u) {
-			    users[u.id] = u;
-			});
-		    }
-		}
-	        socket.emit('postlist', {thread: th, posts: msgs});
+	    Post.find({threadId: th._id}, [], {sort: {seq: 1}}, function (err, posts) {
+	        socket.emit('postlist', {thread: th, posts: posts});
 	    });
         });
     });
@@ -159,7 +148,29 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
         });
     });
 
+    socket.on('react', function(data) {
+	Post.find({threadId: data.threadId, seq: data.seq}, function(err, posts) {
+	    if (posts.length != 1) return;
+
+	    var post = posts[0];
+	    var reaction = {
+		userId: user.id,
+		reactionId: data.reactionId,
+		reactedAt: Date.now()
+	    };
+	    post.reactions.push(reaction);
+	    post.save(function(err) {
+		socket.broadcast.to(projectId).emit('react', reaction)
+		socket.to(projectId).emit('react', post)
+	    });
+	});
+    });
     socket.on('disconnect', function() {
-	console.log('disconnected');
+/*
+	users[projectId] = $.grep(users[projectId], function(u) {
+	    return u.id != user.id;
+	});
+*/
+	socket.broadcast.to(projectId).emit('leave', user);
     });
 });

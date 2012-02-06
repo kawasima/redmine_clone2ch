@@ -1,72 +1,62 @@
-<style>
-ul.reaction {
-	list-style: none;
-	display: inline;
-}
-ul.reaction li {
-	display: inline;
-	border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border: 1px #009900 solid;
-	background-color: #33cc33;
-}
-.contextual span.bbs-status {
-    display: block;
-    background-color: #808080;
-    color: #ffffff;
-    border-radius: 3px;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    padding: 2px;
-}
-
-.contextual span.bbs-status.active {
-    background-color: #006400;
-}
-</style>
-<script src="http://192.168.1.140:2525/socket.io/socket.io.js"></script>
-<%= javascript_include_tag 'jquery-1.7.1.min.js', :plugin => 'redmine_clone2ch' %>
-<%= javascript_include_tag 'handlebars-1.0.0.beta.6.js', :plugin => 'redmine_clone2ch' %>
-<%= javascript_include_tag 'crypto-md5-2.5.3.js', :plugin => 'redmine_clone2ch' %>
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag "bbs" %>
+  <script src="http://192.168.1.140:2525/socket.io/socket.io.js"></script>
+  <%= javascript_include_tag 'jquery-1.7.1.min.js', :plugin => 'redmine_clone2ch' %>
+  <%= javascript_include_tag 'handlebars-1.0.0.beta.6.js', :plugin => 'redmine_clone2ch' %>
+  <%= javascript_include_tag 'crypto-md5-2.5.3.js', :plugin => 'redmine_clone2ch' %>
+  <%= javascript_include_tag "bbs" %>
 <script id="post-template" type="text/x-handlebars-template">
 {{#each posts}}
-<dt id="post-{{seq}}">{{seq}}: {{renderGravatar mail}} {{username}} : {{postedAt}}
-  <ul class="reaction">
-    <li data-reaction="roger"><a title="ラジャー">(`Д´)</a></li>
-    <li data-reaction="thx"><a title="ありがとう">(´▽｀</a></li>
-    <li data-reaction="www"><a title="ワラ">((´∀｀</a></li>
-  </ul>
+<dt class="post" id="post-{{seq}}">{{seq}}: {{renderGravatar userId}} {{renderUsername userId}} : {{postedAt}}
+  <a class="btn btn-primary dropdown-toggle" href="#">♪</a
 </dt>
-<dd><pre>{{renderMessage message}}</pre></dd>
+<dd>
+  <pre>{{renderMessage message}}</pre>
+  {{#if reactions}}
+    <ul>
+    {{#each reactions}}
+      <li>{{renderGravatar userId}} {{renderUsername userId}} : {{reactedAt}} : {{renderReaction reactionId}}</li>
+    {{/each}}
+    </ul>
+  {{/if}}
+</dd>
 {{/each}}
 </script>
-<%= javascript_include_tag "bbs" %>
+<script id="reaction-btn-template" type="text/x-handlebars-template">
+<li><a id="reaction-{{id}}" href="#" title="{{title}}">{{label}}</a></li>
+</script>
+<% end %>
+
 
 <input type="hidden" id="userId" name="userId" value="<%=h @user.id %>"/>
 <input type="hidden" id="projectId" name="projectId" value="<%=h @project.id %>"/>
 
 <div class="contextual">
-  <span class="bbs-status"><%=l(:bbs_status_disconnected)%></span>
+  <span class="label label-success"><%=l(:bbs_status_disconnected)%></span>
 </div>
-<ul id="tlist">
-</ul>
 
-<form id="thread-form" method="POST">
-スレッド名: <input name="name" size="50"/><br/>
-<input type="submit" value="書き込む" name="submit">
-<textarea rows="5" cols="70" wrap="off" name="message"></textarea>
-<input type="hidden" name="threadId" value="1">
-</form>
-
-<hr/>
 <div id="thread-view">
 <h3 id="thread-name"></h3>
 <dl id="plist">
 </dl>
 <form id="post-form" method="POST">
+<textarea rows="5" cols="70" wrap="off" name="message"></textarea><br/>
 <input type="submit" value="書き込む" name="submit">
-<textarea rows="5" cols="70" wrap="off" name="message"></textarea>
-<input type="hidden" name="threadId" value="1">
 </form>
 </div>
+
+<ul class="dropdown-menu">
+</ul>
+
+<% content_for :sidebar do %>
+  <h3>スレ一覧</h3>
+<ul id="tlist">
+</ul>
+
+<form id="thread-form" method="POST">
+スレッド名: <input name="name" size="50"/><br/>
+<textarea rows="5" cols="70" wrap="off" name="message"></textarea><br/>
+<input type="submit" value="書き込む" name="submit">
+</form>
+<% end %>
+

@@ -9,7 +9,7 @@ Redmine::Plugin.register :redmine_clone2ch do
   author_url 'http://about.me/kawasima/'
 
   project_module :clone2ch do
-    permission :view_clone2ch, :bbs => [:index]
+    permission :view_clone2ch, :bbs => [:index, :users]
   end
 
   menu :project_menu, :clone2ch, { :controller => :bbs, :action => 'index'},
