@@ -1,0 +1,7 @@
+redmine:
+  host: localhost
+  port: 80
+  path: /redmine_development
+  admin
+    user: admin
+    password: admin

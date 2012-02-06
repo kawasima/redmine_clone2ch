@@ -1,3 +1,5 @@
 # English strings go here for Rails i18n
 en:
-  my_label: "My label"
+  label_clone2ch: BBS
+  bbs_status_connected: connect
+  bbs_status_disconnected: disconnect

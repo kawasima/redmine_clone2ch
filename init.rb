@@ -12,5 +12,7 @@ Redmine::Plugin.register :redmine_clone2ch do
     permission :view_clone2ch, :bbs => [:index]
   end
 
-  menu :project_menu, :clone2ch, { :controller => :bbs, :action => 'index'}, :param => :project_id
+  menu :project_menu, :clone2ch, { :controller => :bbs, :action => 'index'},
+  :caption => :label_clone2ch,
+  :param => :project_id
 end
