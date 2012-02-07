@@ -1,0 +1,114 @@
+.dropdown-menu {
+    position: absolute;
+    z-index: 1000;
+    backgound: #fff;
+    width: 200px;
+    padding: 0;
+    border: 1px #ccc solid;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+ul.dropdown-menu {
+    position: absolute;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 208px;
+    background-color: #fff;
+}
+
+ul.dropdown-menu li {
+    font-size: 9px;
+    float: left;
+    cursor: pointer;
+    width: 50px;
+    height: 15px;
+    overflow: hidden;
+    border: 1px #ccc solid;
+}
+
+ul.dropdown-menu li a {
+    font-family:IPAMonaPGothic,'IPA モナー Pゴシック',Monapo,Mona,'MS PGothic','ＭＳ Ｐゴシック','ヒラギノ角ゴ Pro W3','HiraKakuProN-W3',sans-serif;
+    font-style: nomal;
+    font-style:normal;
+    letter-spacing: 0;
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    color: #080808;
+}
+
+ul.dropdown-menu li a:hover {
+    color: white;
+    text-decoration: none;
+    background-color: #08C;
+}
+
+.clearfix {
+    clear: both;
+    visibility: hidden;
+    display: block;
+}
+
+.btn {
+display: inline-block;
+padding: 4px 10px 4px;
+font-size: 13px;
+line-height: 18px;
+text-decoration: none;
+border-radius: 3px;
+-moz-border-radius: 3px;
+-webkit-border-radius: 3px;
+box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+-moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+-webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary {
+background-color: #006DCC;
+border-color: #04C #04C #002A80;
+}
+.btn-primary:hover, .btn-primary:active, .btn-primary.active, .btn-primary.disabled, .btn-primary[disabled] {
+background-color: #04C;
+}
+.btn-primary, .btn-primary:hover, .btn-warning, .btn-warning:hover, .btn-danger, .btn-danger:hover, .btn-success, .btn-success:hover, .btn-info, .btn-info:hover {
+text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+color: white;
+}
+
+
+.label {
+    padding: 1px 3px 2px;
+    font-size: 9.75px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    background-color: #999;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.label-success {
+    background-color: #468847;
+}
+
+#tlist {
+    list-style: none;
+    border: 1px #999 solid;
+    overflow: scroll-y;
+    padding:0;
+}
+
+#tlist li {
+    border-bottom: 1px #999 solid;
+    cursor: pointer;
+    margin:0;
+}

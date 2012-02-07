@@ -62,12 +62,10 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 	if (!users[projectId]) {
 	    users[projectId] = []
 	}
-/*
-	for (var i=0; i<users[projectId].length; i++) {
-	    if (users[projectId][i].id  == user.id) 
-	    users[projectId].push(u);
-	}
-*/
+
+	// TODO multiple connection
+	users[projectId].push(u);
+
 	socket.broadcast.to(projectId).emit('join', user);
 	socket.to(projectId).emit('list users', users[projectId]);
     });
@@ -166,11 +164,12 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 	});
     });
     socket.on('disconnect', function() {
-/*
-	users[projectId] = $.grep(users[projectId], function(u) {
-	    return u.id != user.id;
-	});
-*/
+	var ary = [];
+	for (var i=0; i<users[projectId].lentgh; i++) {
+	    if (users[projectId][i].id != user.id)
+		ary.push(users[projectId][i]);
+	};
+	users[projectId] = ary;
 	socket.broadcast.to(projectId).emit('leave', user);
     });
 });
