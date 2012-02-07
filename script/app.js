@@ -81,7 +81,7 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 	Post.count({threadId: msg.threadId}, function (err, cnt) {
 	    msg.seq = cnt + 1;
 	    msg.userId = user.id;
-	    
+
 	    var post = new Post(msg);
 	    post.save();
 
@@ -91,10 +91,10 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 	});
     };
 
-    var threadUpdateFunc = function(th, lastmodified) {
-	th.lastmodified = lastmodified
+    var threadUpdateFunc = function(th) {
+        th.lastmodified = new Date().getTime();
 	th.save();
-	
+
 	var query = Thread.find({})
 	    .where("projectId", th.projectId)
 	    .desc("lastmodified");
@@ -117,7 +117,7 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 
 	msg.threadId = thread._id;
 	msg.userId = userId;
-	
+
 	var query = Thread.find({})
 	    .where("projectId", projectId)
 	    .desc("lastmodified");
@@ -164,12 +164,14 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 	});
     });
     socket.on('disconnect', function() {
-	var ary = [];
-	for (var i=0; i<users[projectId].lentgh; i++) {
-	    if (users[projectId][i].id != user.id)
-		ary.push(users[projectId][i]);
-	};
-	users[projectId] = ary;
+	if (users[projectId]) {
+	    var ary = [];
+	    for (var i=0; i<users[projectId].lentgh; i++) {
+	        if (users[projectId][i].id != user.id)
+		    ary.push(users[projectId][i]);
+	    };
+	    users[projectId] = ary;
+	}
 	socket.broadcast.to(projectId).emit('leave', user);
     });
 });

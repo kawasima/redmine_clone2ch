@@ -112,3 +112,22 @@ color: white;
     cursor: pointer;
     margin:0;
 }
+
+#plist dd li {
+    list-style-type: none;
+}
+
+#user-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: table;
+    float: right;
+    width: auto;
+}
+
+#user-list li {
+    float: right;
+    margin: 1px;
+    cursor: pointer;
+}

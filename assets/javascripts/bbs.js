@@ -48,6 +48,16 @@ jQuery(document).ready(function($) {
 	return users[userId].login;
     });
 
+    Handlebars.registerHelper('renderDate', function (date) {
+        var d = null;
+	if (typeof(date) == 'string') {
+  	    d = new Date(date);
+	} else if (typeof(date) == 'number') {
+	    d = new Date(); d.setTime(date);
+	}
+	return I18n.strftime(d, "%Y/%m/%d(%a) %-H:%M:%S");
+    });
+
     var projectId = $("#projectId").val();
     var userId = $("#userId").val();
     $.ajax({
@@ -59,16 +69,19 @@ jQuery(document).ready(function($) {
 	}
     });
 
-    var socket = io.connect('http://' + location.host + ':2525/bbs?projectId=' + projectId + '&userId=' + userId);
+     var socket = io.connect('http://' + location.hostname + ':2525/bbs?projectId=' + projectId + '&userId=' + userId);
     if (socket) {
-	$(".contextual span.bbs-status").addClass("active").text("connected");
+	$(".contextual span.label").addClass("label-success").text("connected");
     }
+    var threadTemplate = Handlebars.compile($("#thread-template").html());
     var postTemplate = Handlebars.compile($("#post-template").html());
     var reactionBtnTemplate = Handlebars.compile($("#reaction-btn-template").html());
+    var userTemplate = Handlebars.compile($("#user-template").html());
+
     var currentThreadId = null;
 
     socket.on('disconnect', function() {
-	$(".contextual span.bbs-status").removeClass("active").text("disconnected");
+	$(".contextual span.label").removeClass("label-success").text("disconnected");
     });
 
     socket.on('postlist', function(data) {
@@ -79,20 +92,16 @@ jQuery(document).ready(function($) {
     socket.on('threadlist', function(tlist) {
 	$("#tlist").empty();
 	$.each(tlist, function(i) {
-	    $("#tlist").append(
-		$("<li/>")
-		    .addClass(i % 2 == 0 ? "even" : "odd")
-		    .text(this.name)
-		    .attr("id", "th-" + this._id)
-		    .bind("click", function() {
-			var id = $(this).attr("id");
-			var tid = id.substring(3);
-			location.hash = tid;
-			currentThreadId = tid;
-			socket.emit('postlist', {threadId: tid});
-			return false;
-		    })
-	    );
+	    $("#tlist").append(threadTemplate(this));
+	    $("#th-" + this._id)
+	      .bind("click", function() {
+		var id = $(this).attr("id");
+		var tid = id.substring(3);
+		location.hash = tid;
+		currentThreadId = tid;
+		socket.emit('postlist', {threadId: tid});
+		return false;
+	      });
 	});
     });
 
@@ -100,8 +109,15 @@ jQuery(document).ready(function($) {
 	$("#plist").append(postTemplate({posts: [msg]}));
     });
 
-    socket.on('react', function(msg) {
+    socket.on('react', function (msg) {
 	$("#plist dt#post-" + msg.seq).replaceWith(postTemplate({ posts: [msg] }));
+	$("#plist dt#post-" + msg.seq + " + dd").remove();
+    });
+
+    socket.on("list users", function (userList) {
+      $(userList).each(function(i, user) {
+	$("#user-list").append(userTemplate(user));
+      });
     });
 
     $("#thread-form").submit(function(e) {

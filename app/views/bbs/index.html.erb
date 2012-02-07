@@ -1,13 +1,20 @@
 <% content_for :header_tags do %>
   <%= stylesheet_link_tag "bbs" %>
-  <script src="http://192.168.1.140:2525/socket.io/socket.io.js"></script>
+  <script src="http://<%= request.domain %>:2525/socket.io/socket.io.js"></script>
   <%= javascript_include_tag 'jquery-1.7.1.min.js', :plugin => 'redmine_clone2ch' %>
   <%= javascript_include_tag 'handlebars-1.0.0.beta.6.js', :plugin => 'redmine_clone2ch' %>
   <%= javascript_include_tag 'crypto-md5-2.5.3.js', :plugin => 'redmine_clone2ch' %>
+  <%= javascript_include_tag 'i18n.js', :plugin => 'redmine_clone2ch' %>
   <%= javascript_include_tag "bbs" %>
+<script id="thread-template" type="text/x-handlebars-template">
+<li id="th-{{_id}}">
+  <span>{{renderDate lastmodified}}</span>
+  <h3>{{name}}</h3>
+</li>
+</script>
 <script id="post-template" type="text/x-handlebars-template">
 {{#each posts}}
-<dt class="post" id="post-{{seq}}">{{seq}}: {{renderGravatar userId}} {{renderUsername userId}} : {{postedAt}}
+<dt class="post" id="post-{{seq}}">{{seq}}: {{renderGravatar userId}} {{renderUsername userId}} : {{renderDate postedAt}}
   <a class="btn btn-primary dropdown-toggle" href="#">♪</a
 </dt>
 <dd>
@@ -15,15 +22,35 @@
   {{#if reactions}}
     <ul>
     {{#each reactions}}
-      <li>{{renderGravatar userId}} {{renderUsername userId}} : {{reactedAt}} : {{renderReaction reactionId}}</li>
+      <li>{{renderGravatar userId}} {{renderUsername userId}} : {{renderDate reactedAt}} : {{renderReaction reactionId}}</li>
     {{/each}}
     </ul>
   {{/if}}
 </dd>
 {{/each}}
 </script>
+
 <script id="reaction-btn-template" type="text/x-handlebars-template">
 <li><a id="reaction-{{id}}" href="#" title="{{title}}">{{label}}</a></li>
+</script>
+
+<script id="user-template" type="text/x-handlebars-template">
+<li id="user-{{id}}">{{renderGravatar id}}</li>
+</script>
+
+<script>
+I18n.translations = {
+  ja: {
+    date: {
+      meridian: ["午前", "午後"],
+      abbr_day_names: ["月", "火", "水", "木", "金", "土", "日"],
+      day_names: ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"],
+      abbr_month_names: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+      month_names: ["睦月", "如月", "弥生", "卯月", "皐月", "水無月", "文月", "葉月", "長月", "神無月", "霜月", "師走"]
+    }
+  }
+};
+I18n.locale = "ja";
 </script>
 <% end %>
 
@@ -33,6 +60,8 @@
 
 <div class="contextual">
   <span class="label label-success"><%=l(:bbs_status_disconnected)%></span>
+  <ul id="user-list">
+  </ul>
 </div>
 
 <div id="thread-view">
@@ -55,7 +84,7 @@
 
 <form id="thread-form" method="POST">
 スレッド名: <input name="name" size="50"/><br/>
-<textarea rows="5" cols="70" wrap="off" name="message"></textarea><br/>
+<textarea rows="5" cols="50" wrap="off" name="message"></textarea><br/>
 <input type="submit" value="書き込む" name="submit">
 </form>
 <% end %>
