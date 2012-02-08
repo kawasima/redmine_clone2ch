@@ -58,29 +58,31 @@ ul.dropdown-menu li a:hover {
 }
 
 .btn {
-display: inline-block;
-padding: 4px 10px 4px;
-font-size: 13px;
-line-height: 18px;
-text-decoration: none;
-border-radius: 3px;
--moz-border-radius: 3px;
--webkit-border-radius: 3px;
-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
--moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
--webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    color: 
+    display: inline-block;
+    padding: 4px 10px 4px;
+    font-size: 13px;
+    line-height: 18px;
+    text-decoration: none;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary {
-background-color: #006DCC;
-border-color: #04C #04C #002A80;
+    background-color: #006DCC;
+    border-color: #04C #04C #002A80;
 }
 .btn-primary:hover, .btn-primary:active, .btn-primary.active, .btn-primary.disabled, .btn-primary[disabled] {
-background-color: #04C;
+    background-color: #04C;
+    text-decoration: none;
 }
-.btn-primary, .btn-primary:hover, .btn-warning, .btn-warning:hover, .btn-danger, .btn-danger:hover, .btn-success, .btn-success:hover, .btn-info, .btn-info:hover {
-text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-color: white;
+.btn-primary:link, .btn-primary:hover, .btn-warning, .btn-warning:hover, .btn-danger, .btn-danger:hover, .btn-success, .btn-success:hover, .btn-info, .btn-info:hover {
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    color: white;
 }
 
 
@@ -108,9 +110,17 @@ color: white;
 }
 
 #tlist li {
+    background-color: #fff;
+    overflow: hidden;
     border-bottom: 1px #999 solid;
     cursor: pointer;
     margin:0;
+}
+
+#tlist li h3 {
+    border: none;
+    margin: 0;
+    padding: 0;
 }
 
 #plist dd li {

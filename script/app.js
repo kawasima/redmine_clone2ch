@@ -60,13 +60,18 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 	user = u;
 	socket.join(projectId);
 	if (!users[projectId]) {
-	    users[projectId] = []
+	    console.log("--- initialize users")
+	    users[projectId] = [];
 	}
 
 	// TODO multiple connection
 	users[projectId].push(u);
 
 	socket.broadcast.to(projectId).emit('join', user);
+	socket.to(projectId).emit('connected');
+    });
+
+    socket.on('list users', function () {
 	socket.to(projectId).emit('list users', users[projectId]);
     });
 
@@ -158,11 +163,16 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 	    };
 	    post.reactions.push(reaction);
 	    post.save(function(err) {
-		socket.broadcast.to(projectId).emit('react', reaction)
+		socket.broadcast.to(projectId).emit('react', post)
 		socket.to(projectId).emit('react', post)
 	    });
 	});
     });
+
+    socket.on('call user', function(data) {
+	socket.broadcast.to(projectId).emit('call user', data);
+    });
+
     socket.on('disconnect', function() {
 	if (users[projectId]) {
 	    var ary = [];
@@ -173,5 +183,6 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 	    users[projectId] = ary;
 	}
 	socket.broadcast.to(projectId).emit('leave', user);
+	socket.leave(projectId);
     });
 });

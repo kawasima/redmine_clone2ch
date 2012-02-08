@@ -60,19 +60,8 @@ jQuery(document).ready(function($) {
 
     var projectId = $("#projectId").val();
     var userId = $("#userId").val();
-    $.ajax({
-	url: "clone2ch/users.json",
-	success: function(data) {
-	    $.each(data.users, function(i, user) {
-		users[user.id] = user;
-	    });
-	}
-    });
 
-     var socket = io.connect('http://' + location.hostname + ':2525/bbs?projectId=' + projectId + '&userId=' + userId);
-    if (socket) {
-	$(".contextual span.label").addClass("label-success").text("connected");
-    }
+    var socket = io.connect('http://' + location.hostname + ':2525/bbs?projectId=' + projectId + '&userId=' + userId);
     var threadTemplate = Handlebars.compile($("#thread-template").html());
     var postTemplate = Handlebars.compile($("#post-template").html());
     var reactionBtnTemplate = Handlebars.compile($("#reaction-btn-template").html());
@@ -80,7 +69,26 @@ jQuery(document).ready(function($) {
 
     var currentThreadId = null;
 
-    socket.on('disconnect', function() {
+    socket.on('connected', function () {
+	$(".contextual span.label").addClass("label-success").text("connected");
+	$.ajax({
+	    url: "clone2ch/users.json",
+	    success: function(data) {
+		$.each(data.users, function(i, user) {
+		    users[user.id] = user;
+		});
+		socket.emit('list users');
+		socket.emit('threadlist', {});
+		if (location.hash) {
+		    var tid = location.hash.substring("#".length);
+		    currentThreadId = tid;
+		    socket.emit('postlist', {threadId: tid});
+		}
+	    }
+	});
+    });
+
+    socket.on('disconnect', function () {
 	$(".contextual span.label").removeClass("label-success").text("disconnected");
     });
 
@@ -106,18 +114,60 @@ jQuery(document).ready(function($) {
     });
 
     socket.on('update post', function(msg) {
-	$("#plist").append(postTemplate({posts: [msg]}));
+	if (currentThreadId == msg.threadId) {
+	    $("#plist").append(postTemplate({posts: [msg]}));
+	}
+	if (userId != msg.userId) {
+	    $.gritter.add({
+		title: Handlebars.helpers["renderUsername"](msg.userId),
+		text: msg.message,
+		sticky: false});
+	}
     });
 
     socket.on('react', function (msg) {
-	$("#plist dt#post-" + msg.seq).replaceWith(postTemplate({ posts: [msg] }));
 	$("#plist dt#post-" + msg.seq + " + dd").remove();
+	$("#plist dt#post-" + msg.seq).replaceWith(postTemplate({ posts: [msg] }));
     });
 
     socket.on("list users", function (userList) {
-      $(userList).each(function(i, user) {
+	$("#user-list").empty();
+	$(userList).each(function(i, user) {
+	    $("#user-list").append(userTemplate(user));
+	    $("#user-list li#user-" + user.id).data("login", user.login);
+	});
+    });
+
+    socket.on("join", function (user) {
 	$("#user-list").append(userTemplate(user));
-      });
+	$("#user-list li#user-" + user.id).data("login", user.login);
+	$.gritter.add({
+	    title: 'ログイン',
+	    text: user.login + 'が接続しました',
+	    sticky: false});
+    });
+
+    socket.on("leave", function (user) {
+	$("#user-list li#user-" + user.id).remove();
+    });
+
+    socket.on("call user", function (data) {
+	var caller = users[data.caller];
+	var name = (caller) ? caller.login : "誰かさん";
+	if (data.callee == userId && window.confirm(name + "が呼んでいます")) {
+	    socket.emit('reply calling', data)
+	}
+    })
+    socket.on("reply calling", function(u) {
+	
+    });
+
+    // Calling directly
+    $("#user-list li.user-icon").live("click", function() {
+	if (window.confirm($(this).data("login") + "を呼び出します")) {
+	    var callee = $(this).attr("id").substring("user-".length);
+	    socket.emit('call user', {caller: userId, callee: callee});
+	}
     });
 
     $("#thread-form").submit(function(e) {
@@ -174,10 +224,4 @@ jQuery(document).ready(function($) {
     });
 
     $("#thread-view").hide();
-    socket.emit('threadlist', {});
-    if (location.hash) {
-	var tid = location.hash.substring("#".length);
-	currentThreadId = tid;
-	socket.emit('postlist', {threadId: tid});
-    }
 });
