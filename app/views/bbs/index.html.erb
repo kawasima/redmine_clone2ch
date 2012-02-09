@@ -1,13 +1,13 @@
 <% content_for :header_tags do %>
   <%= stylesheet_link_tag 'jquery.gritter.css', :plugin => 'redmine_clone2ch' %>
-  <%= stylesheet_link_tag "bbs" %>
+  <%= stylesheet_link_tag "bbs" , :plugin => 'redmine_clone2ch' %>
   <script src="http://<%= request.host %>:2525/socket.io/socket.io.js"></script>
   <%= javascript_include_tag 'jquery-1.7.1.min.js', :plugin => 'redmine_clone2ch' %>
   <%= javascript_include_tag 'handlebars-1.0.0.beta.6.js', :plugin => 'redmine_clone2ch' %>
   <%= javascript_include_tag 'crypto-md5-2.5.3.js', :plugin => 'redmine_clone2ch' %>
   <%= javascript_include_tag 'i18n.js', :plugin => 'redmine_clone2ch' %>
   <%= javascript_include_tag 'jquery.gritter.min.js', :plugin => 'redmine_clone2ch' %>
-  <%= javascript_include_tag "bbs" %>
+  <%= javascript_include_tag "bbs" , :plugin => 'redmine_clone2ch' %>
 <script id="thread-template" type="text/x-handlebars-template">
 <li id="th-{{_id}}">
   <span>{{renderDate lastmodified}}</span>
