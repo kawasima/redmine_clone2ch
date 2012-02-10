@@ -61,13 +61,15 @@ jQuery(document).ready(function($) {
     var projectId = $("#projectId").val();
     var userId = $("#userId").val();
 
-    var socket = io.connect('http://' + location.hostname + ':2525/bbs?projectId=' + projectId + '&userId=' + userId);
     var threadTemplate = Handlebars.compile($("#thread-template").html());
     var postTemplate = Handlebars.compile($("#post-template").html());
     var reactionBtnTemplate = Handlebars.compile($("#reaction-btn-template").html());
     var userTemplate = Handlebars.compile($("#user-template").html());
+    var writingTemplate = Handlebars.compile($("#writing-template").html());
 
     var currentThreadId = null;
+
+    var socket = io.connect('http://' + location.hostname + ':2525/bbs?projectId=' + projectId + '&userId=' + userId);
 
     socket.on('connected', function () {
 	$(".contextual span.label").addClass("label-success").text("connected");
@@ -162,6 +164,16 @@ jQuery(document).ready(function($) {
 	
     });
 
+    socket.on("start writing", function (data) {
+	if (data.threadId == currentThreadId)
+	    $("#others-activity").html(writingTemplate(data.user));
+    });
+
+    socket.on("stop writing", function(data) {
+	if (data.threadId == currentThreadId)
+	    $("#others-activity").empty();
+    });
+
     // Calling directly
     $("#user-list li.user-icon").live("click", function() {
 	if (window.confirm($(this).data("login") + "を呼び出します")) {
@@ -195,10 +207,10 @@ jQuery(document).ready(function($) {
 
     $("#post-form :input[name=message]")
 	.focus(function () {
-	    socket.emit('writing now', {username: $(":input[name=username]").val() });
+	    socket.emit('start writing', { threadId: currentThreadId });
 	})
 	.blur(function () {
-	    socket.emit('writing stop', {username: $(":input[name=username]").val() });
+	    socket.emit('stop writing', { threadId: currentThreadId });
 	});
 
     $.each(reactions, function (i, reaction) {

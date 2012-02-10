@@ -162,15 +162,23 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 		reactedAt: Date.now()
 	    };
 	    post.reactions.push(reaction);
-	    post.save(function(err) {
+	    post.save(function (err) {
 		socket.broadcast.to(projectId).emit('react', post)
 		socket.to(projectId).emit('react', post)
 	    });
 	});
     });
 
-    socket.on('call user', function(data) {
+    socket.on('call user', function (data) {
 	socket.broadcast.to(projectId).emit('call user', data);
+    });
+
+    socket.on('start writing', function (data) {
+	socket.broadcast.to(projectId).emit('start writing', { user: user, threadId: data.threadId });
+    });
+
+    socket.on('stop writing', function (data) {
+	socket.broadcast.to(projectId).emit('stop writing', { user: user, threadId: data.threadId });
     });
 
     socket.on('disconnect', function() {

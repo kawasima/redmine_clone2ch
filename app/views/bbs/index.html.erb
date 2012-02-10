@@ -40,6 +40,10 @@
 <li id="user-{{id}}" class="user-icon">{{renderGravatar id}}</li>
 </script>
 
+<script id="writing-template" type="text/x-handlebars-template">
+{{renderGravatar id}} <%= image_tag 'writing.gif', :plugin => 'redmine_clone2ch' %>
+</script>
+
 <script>
 I18n.translations = {
   ja: {
@@ -70,6 +74,8 @@ I18n.locale = "ja";
 <h3 id="thread-name"></h3>
 <dl id="plist">
 </dl>
+<div id="others-activity"></div>
+
 <form id="post-form" method="POST">
 <textarea rows="5" cols="70" wrap="off" name="message"></textarea><br/>
 <input type="submit" value="書き込む" name="submit">
