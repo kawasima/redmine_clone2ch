@@ -5,3 +5,6 @@ redmine:
   admin:
     user: admin
     password: admin
+
+
+This is connection settings for Redmine.
