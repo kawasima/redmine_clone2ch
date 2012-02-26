@@ -1,0 +1,47 @@
+= clone2ch
+
+これはRedmineのプラグインとして動作し、2ちゃんねるライクなUIでリアルタイムなコミュニケーションを可能にするツールです。
+
+= 必要条件
+
+Redmineのユーザ情報取得APIを利用するため、1.1以上のバージョンが必要です。
+
+
+= インストール
+
+== プラグインのインストール
+
+Redmineをインストールしたディレクトリにいき下記コマンドを実行します。
+
+  $ cd vendor/plugins
+  $ git clone https://github.com/kawasima/redmine_clone2ch.git
+
+== node.jsのインストール
+
+メッセージ送配信はSocket.IOを使って行われるので、{node.js}[http://nodejs.org/]をインストールします。バージョンは0.6以上であれば動作すると思います。
+
+Nodeの依存ライブラリをインストールします。
+
+* socket.io
+* mongoose
+* jquery
+* jsdom
+* props
+
+== MongoDBのインストール
+
+メッセージはRedmineのデータベースではなく、MondoDBに格納するので{Mongo}[http://www.mongodb.org/downloads]もインストールしておいてください。
+
+== メッセージ配信サーバの設定
+
+config/settings.yml.example をコピーして、config/settings.yml というファイルを作り、redmineへの接続設定をします。adminの項目はRedmineの管理権限を持ったユーザのIDとパスワードを設定してください。
+
+= サーバの起動
+
+MongoDBを起動します (現在はデフォルトのポート27017で立ち上げている想定になっています)。
+
+メッセージ配信サーバを起動します。
+
+  $ node script/app.js
+
+Redmine上で「掲示板」タブを開きステータスが「接続中」になったら成功です！
