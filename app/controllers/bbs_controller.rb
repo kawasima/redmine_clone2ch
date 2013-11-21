@@ -1,10 +1,10 @@
 class BbsController < ApplicationController
   unloadable
 
-  accept_key_auth :users
+  accept_api_auth :users
 
   def index
-    @user = find_current_user
+    @user = User.current
     @project = Project.find(params[:project_id])
   end
 

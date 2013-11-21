@@ -28,15 +28,16 @@ exports.getUser = function (userId, callback) {
 	    res.setEncoding('utf8');
 	    res.on('data', function (content) {
 		var document = jsdom.jsdom(content);
+		console.log("content: " + content);
 		var data = {
-		    id: $("user id", document).text(),
-		    login: $("user login", document).text(),
-		    firstname: $("user firstname", document).text(),
-		    lastname: $("user lastname", document).text(),
-		    mail: $("user mail", document).text(),
+		    id: $("user > id", document).text(),
+		    login: $("user > login", document).text(),
+		    firstname: $("user > firstname", document).text(),
+		    lastname: $("user > lastname", document).text(),
+		    mail: $("user > mail", document).text(),
 		    projects: [ ]
 		};
-		$("memberships membership", document).each(function(i, m) {
+		$("memberships > membership", document).each(function(i, m) {
 		    data.projects.push($("project", m).attr("id"));
 		});
 		var user = new User(data);

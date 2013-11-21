@@ -76,7 +76,7 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
     });
 
     socket.on('threadlist', function (data) {
-	Thread.find({projectId: projectId}, [], { sort: { lastmodified: -1 }}, function (err,threads) {
+	Thread.find({projectId: projectId}, null, { sort: { lastmodified: -1 }}, function (err,threads) {
 	    socket.emit('threadlist', threads);
 	});
     });
@@ -102,7 +102,7 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 
 	var query = Thread.find({})
 	    .where("projectId", th.projectId)
-	    .desc("lastmodified");
+	    .sort("-lastmodified");
 
 	query.exec(function (err, threads) {
 	    socket.broadcast.to(projectId).emit('threadlist', threads);
@@ -125,7 +125,7 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 
 	var query = Thread.find({})
 	    .where("projectId", projectId)
-	    .desc("lastmodified");
+	    .sort("-lastmodified");
 	query.exec(function (err, threads) {
 	    console.log(threads);
 	    socket.broadcast.to(projectId).emit('threadlist', threads);
@@ -137,7 +137,7 @@ var bbs = io.of('/bbs').on('connection', function (socket) {
 
     socket.on('postlist', function (data) {
 	Thread.findById(data.threadId, function (err, th) {
-	    Post.find({threadId: th._id}, [], {sort: {seq: 1}}, function (err, posts) {
+	    Post.find({threadId: th._id}, null, {sort: {seq: 1}}, function (err, posts) {
 	        socket.emit('postlist', {thread: th, posts: posts});
 	    });
         });

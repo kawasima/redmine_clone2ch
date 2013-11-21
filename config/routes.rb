@@ -1,7 +1,2 @@
-ActionController::Routing::Routes.draw do |map|
-  map.connect 'projects/:project_id/clone2ch/:action/', :controller => :bbs
-
-  map.with_options :controller => 'bbs', :action => 'users' ,:conditions => {:method => :get} do |bbs|
-    bbs.connect 'projects/:project_id/clone2ch/users.:format'
-  end
-end
+match 'projects/:project_id/clone2ch/(:action)', :controller => :bbs
+get 'projects/:project_id/clone2ch/users.:format', :controller => 'bbs', :action => 'users'
